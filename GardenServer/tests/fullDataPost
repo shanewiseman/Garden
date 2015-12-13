@@ -1,0 +1,14 @@
+{
+    "auth" : {
+        "username" : "0e57eb4bde0d36459c543921c716db8b",
+        "password" : "Ef@490515+"
+    },
+    "data" : {
+        "0e57eb4bde0d36459c543921c716db8c" : {
+            "0e57eb4bde0d36459c543921c716db8d" : { 
+                "testkey" : "testdata"
+            }
+        }
+    }
+
+}
