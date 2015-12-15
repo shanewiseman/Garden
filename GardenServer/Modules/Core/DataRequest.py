@@ -1,87 +1,136 @@
-from GardenServer.models import *
+from GardenServer.Modules.Core    import GardenModels
 import logging
+import json
+import ast
+import re
+import time
 
 logger = logging.getLogger(__name__)
 
-def store( userObj , data ):
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def request( userObj , data ):
+    logger.info("Screening Request")
 
     for deviceKey in data.keys():
 
-        logger.info( "Processing Device: " + deviceKey )
-        try:
-            deviceObj = Device.objects.get( indentifier = deviceKey)
-            logger.debug( "DeviceObj: " + deviceObj.identifier )
-        except model.DoesNotExist:
-            logger.error( "Device Does Not Exist: " + deviceKey )
+        deviceObj = GardenModels.getDevice( identifier = deviceKey)
+
+        if deviceObj == None:
             return 0
 
+        logger.debug( "DeviceObj: " + deviceObj.identifier )
+
         # making sure device belongs to the user
-        if deviceObj.user.id != userObj.id:
+        if deviceObj.user.identifier != userObj.identifier:
             logger.error( "Device Does Not Belong To User: " + deviceKey )
             return 0
 
-        # device may have different data types
-        for dataTypeKey in data.deviceKey.keys():
+        for dataTypeKey in data[ deviceKey ].keys():
 
-            logger.debug( "Processing DataType: " + dataTypeKey )
-            try:
-                dataTypeObj = DataType( identifier = dataTypeKey )
-                logger.debug( "DataType: " + dataTypeObj.identifier )
-            except model.DoesNotExist:
-                logger.error( "DataType Does Not Exist: " + dataTypeKey )
+            dataTypeObj = GardenModels.getDataType( identifier = dataTypeKey )
+
+            if dataTypeObj == None:
                 return 0
 
-            prepareReponseObject( deviceObj , dataTypeObj )
+            logger.debug( "DataTypeObj: " + dataTypeObj.identifier )
 
-            logger.debug( "Converting Data" )
-            storeData = json.dumps( data.device.datatype )
+            __prepareResponseObject( deviceObj , dataTypeObj )
+        #endfor
+    #endfor
+    return __storeData( data )
+#enddef
+
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def response( userObj ):
+
+    logger.info( "Response for " + str( userObj.identifier ) )
+
+    deviceObjs = GardenModels.getDeviceList( user_id = userObj.identifier )
+
+    logger.info( "Process Response for " + str( len(deviceObjs) ) + " Devices" )
+
+    if len(deviceObjs) < 1:
+        return 0
+
+    returnData = {}
+    for deviceObj in deviceObjs:
+
+        logger.debug( "Working on " + deviceObj.identifier )
+        returnData[ deviceObj.identifier ] = {}
+        responseObjs = GardenModels.getResponseList( device =  deviceObj )
+
+        for responseObj in responseObjs:
+            logger.debug( "Response Object: " + str( responseObj.identifier ) )
+            returnData[ responseObj.device.identifier ][ responseObj.datatype.identifier ] = \
+                    responseObj.value
+
+        #endfor
+        returnDataString = __formatResponse( returnData )
+        logger.debug("Response: " + returnDataString )
+
+    return returnDataString
+#enddef
+
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def __storeData( data ):
+    logger.info("Storing Data For Request")
+    for deviceKey in data.keys():
+
+        logger.debug( "Processing Device: " + deviceKey )
+        deviceObj = GardenModels.getDevice( identifier = deviceKey)
+
+        # device may have different data types
+        for dataTypeKey in data[ deviceKey ].keys():
+
+            logger.debug( "Processing DataType: " + dataTypeKey )
+            dataTypeObj = GardenModels.getDataType( identifier = dataTypeKey )
+
+            logger.info( "Converting Data" )
+            storeData = json.dumps( data[ deviceKey ][ dataTypeKey ] )
             logger.debug( storeData )
 
             logger.info( "Creating Data Objects -> Device: " + deviceKey + " Type: " + dataTypeKey )
-            Data( device = device , datatype = dataType , value = storeData ).save()
+            GardenModels.setData( deviceObj , dataTypeObj , storeData )
 
         #endfor
         logger.info( "Done with Device" )
     #endfor
 
-    return
+    return 1
 #enddef
 
-def response( userObj ):
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def __formatResponse( returnData ):
 
-    logger.info( "Reponse for " + userObj.id )
+    response = json.dumps( returnData )
+    response = re.sub(r'\\','', response)
+    response = re.sub(r'"\{','{', response)
+    response = re.sub(r'\}"','}', response)
+    response = re.sub(r'"\[','[', response)
+    response = re.sub(r'\]"',']', response)
 
-    devices = Devices.objects.filter( user_id = userObj.id )
+    return response
 
-    logger.info( "Process Response for " + len(devices) + " Devices" )
-
-    if len(devices) < 1:
-        return 0
-
-    responses = {}
-    for device in devices:
-
-        logger.debug( "Working on " + device.identifier )
-        responses[ device.identifier ] = {}
-        resonseObjs= Response.objects.filter( device =  device )
-
-        for responseObj in responseObjs:
-            logger.debug( "Response Object: " + responseObj.id )
-            responses[ responseObj.device.identifier ][ responseObj.datatype.identifier ] = \
-                    responseObj.value
-
-        #endfor
-    return responses
 #enddef
 
-def prepareResponseObject( deviceObj , dataTypeObj ):
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def __prepareResponseObject( deviceObj , dataTypeObj ):
 
     logger.debug("PreparingResponseObject")
-    try:
-        Response.objects.get( device = deviceObj , datatype = dataTypeObj )
-    except model.DoesNotExist:
-        logger.info("Creating Response Object")
-        Response( device = deviceObj , datatype = dataTypeObj , value = "" )
+    if None == GardenModels.getResponse( device = deviceObj , datatype = dataTypeObj ):
+        GardenModels.setResponse( deviceObj, dataTypeObj, "" )
+
+        #NOTE need to instantiate processor
 
 #enddef
 

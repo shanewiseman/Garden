@@ -18,5 +18,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^data/', views.dataPost, name='dataPost'),
+    url(r'^data/', views.dataRequest, name='dataRequest'),
+    url(r'^processor/', views.processorRequest , name='processorRequest'),
 ]
