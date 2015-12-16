@@ -36,6 +36,18 @@ def getData( **kwargs ):
 ################################################################################
 #------------------------------------------------------------------------------#
 ################################################################################
+def getDataRange( range , **kwargs ):
+    logger.debug("Getting Data")
+    try:
+        return Data.objects.filter( **kwargs ).order_by('created').reverse()[ :range]
+    except Data.DoesNotExist:
+        logger.warn("Data Does Not Exist: " + str(kwargs) )
+        return None
+#enddef
+
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
 def setResponse( deviceObj , dataTypeObj , data ):
 
     logger.info("Creating Response Object")

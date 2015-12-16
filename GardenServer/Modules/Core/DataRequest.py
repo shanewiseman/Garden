@@ -1,4 +1,5 @@
 from GardenServer.Modules.Core    import GardenModels
+from GardenServer.Modules.Helpers import DataFormat
 import logging
 import json
 import ast
@@ -18,21 +19,21 @@ def request( userObj , data ):
         deviceObj = GardenModels.getDevice( identifier = deviceKey)
 
         if deviceObj == None:
-            return 0
+            return False
 
         logger.debug( "DeviceObj: " + deviceObj.identifier )
 
         # making sure device belongs to the user
         if deviceObj.user.identifier != userObj.identifier:
             logger.error( "Device Does Not Belong To User: " + deviceKey )
-            return 0
+            return False
 
         for dataTypeKey in data[ deviceKey ].keys():
 
             dataTypeObj = GardenModels.getDataType( identifier = dataTypeKey )
 
             if dataTypeObj == None:
-                return 0
+                return False
 
             logger.debug( "DataTypeObj: " + dataTypeObj.identifier )
 
@@ -54,7 +55,7 @@ def response( userObj ):
     logger.info( "Process Response for " + str( len(deviceObjs) ) + " Devices" )
 
     if len(deviceObjs) < 1:
-        return 0
+        return False
 
     returnData = {}
     for deviceObj in deviceObjs:
@@ -69,7 +70,7 @@ def response( userObj ):
                     responseObj.value
 
         #endfor
-        returnDataString = __formatResponse( returnData )
+        returnDataString = DataFormat.formatJsonResponse( returnData )
         logger.debug("Response: " + returnDataString )
 
     return returnDataString
@@ -103,22 +104,6 @@ def __storeData( data ):
     #endfor
 
     return 1
-#enddef
-
-################################################################################
-#------------------------------------------------------------------------------#
-################################################################################
-def __formatResponse( returnData ):
-
-    response = json.dumps( returnData )
-    response = re.sub(r'\\','', response)
-    response = re.sub(r'"\{','{', response)
-    response = re.sub(r'\}"','}', response)
-    response = re.sub(r'"\[','[', response)
-    response = re.sub(r'\]"',']', response)
-
-    return response
-
 #enddef
 
 ################################################################################
