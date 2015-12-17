@@ -10,14 +10,17 @@ logger = logging.getLogger(__name__)
 ################################################################################
 def setData( deviceObj, dataTypeObj, data ):
     logger.debug("Setting Data")
-    Data(
+    obj = Data(
         identifier = Authentication.generateIdentifier(
             [ deviceObj.identifier , dataTypeObj.identifier, data, time.time() ]
         ),
         device = deviceObj,
         datatype = dataTypeObj,
         value = data
-    ).save()
+    )
+
+    obj.save()
+    return obj
 
 #enddef
 
@@ -51,14 +54,18 @@ def getDataRange( range , **kwargs ):
 def setResponse( deviceObj , dataTypeObj , data ):
 
     logger.info("Creating Response Object")
-    Response(
+    obj = Response(
         identifier = Authentication.generateIdentifier(
             [ deviceObj.identifier , dataTypeObj.identifier , time.time() ]
         ),
         device = deviceObj,
         datatype = dataTypeObj,
         value = data
-    ).save()
+    )
+
+    obj.save()
+
+    return obj
 
 #enddef
 

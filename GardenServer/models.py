@@ -54,7 +54,7 @@ class Response ( models.Model ):
 
 class ProcessorInstance ( models.Model ):
     identifier  = models.CharField( max_length = 64 , primary_key=True )
-    channel     = models.CharField( max_length = 255 )
+    node        = models.CharField( max_length = 255 )
     device      = models.ForeignKey( Device , on_delete=models.CASCADE )
     datatype    = models.ForeignKey( DataType , on_delete=models.CASCADE )
     created     = models.DateTimeField(auto_now=True)

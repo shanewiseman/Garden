@@ -1,5 +1,6 @@
 from GardenServer.Modules.Core    import GardenModels
 from GardenServer.Modules.Helpers import DataFormat
+from GardenServer.Modules.Core    import Processor
 import logging
 import json
 import ast
@@ -113,9 +114,9 @@ def __prepareResponseObject( deviceObj , dataTypeObj ):
 
     logger.debug("PreparingResponseObject")
     if None == GardenModels.getResponse( device = deviceObj , datatype = dataTypeObj ):
-        GardenModels.setResponse( deviceObj, dataTypeObj, "" )
+        responseObj = GardenModels.setResponse( deviceObj, dataTypeObj, "" )
+        Processor.createProcessor( dataTypeObj , deviceObj , responseObj )
 
-        #NOTE need to instantiate processor
 
 #enddef
 

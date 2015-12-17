@@ -5,9 +5,9 @@
     },
     "data" : {
         "8cccd59e0fefb40736135fd40f4d92ffd4ff0a932f46976cc17b6ccbd8cf1564" : {
-            "c55886045a24c2f5179ca7f6d60a69fca046be2005b5a09c6c1726334c81159a" : { 
-                "testkey" : "testdata"
-            }
+            "c55886045a24c2f5179ca7f6d60a69fca046be2005b5a09c6c1726334c81159a" :  
+                600
+            
         }
     }
 

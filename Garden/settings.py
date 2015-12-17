@@ -28,6 +28,14 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+PROCCESSOR_NODES = [ '127.0.0.1' ]
+SSHID            = '/home/swiseman/garden_env/Dev/Garden/GardenServer/ProcessorSSH'
+MASTER_HOSTNAME  = '10.0.0.250'
+
+
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
