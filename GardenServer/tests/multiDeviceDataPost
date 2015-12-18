@@ -5,14 +5,12 @@
     },
     "data" : {
         "8cccd59e0fefb40736135fd40f4d92ffd4ff0a932f46976cc17b6ccbd8cf1564" : {
-            "c55886045a24c2f5179ca7f6d60a69fca046be2005b5a09c6c1726334c81159a" : { 
-                "testkey" : "testdata"
-            }
+            "c55886045a24c2f5179ca7f6d60a69fca046be2005b5a09c6c1726334c81159a" : 200 
+                
         },
         "2bd6a6f557ea6cb77d7b2cc87894011370c20a06753c5f330a9319da2d1bd075" : {
-            "c55886045a24c2f5179ca7f6d60a69fca046be2005b5a09c6c1726334c81159a" : { 
-                "testkey" : "testdata"
-            }
+            "ec6b93a141036a83fc36ff6fa327e05ae665c9bb048fe75477006171902ff584" : 150 
+            
         }
     }
 
