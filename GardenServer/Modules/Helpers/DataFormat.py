@@ -9,5 +9,6 @@ def formatJsonResponse( data ):
     response = re.sub(r'\}"','}', response)
     response = re.sub(r'"\[','[', response)
     response = re.sub(r'\]"',']', response)
+    response = re.sub(r'""','"', response)
 
     return response

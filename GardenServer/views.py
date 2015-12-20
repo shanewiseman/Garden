@@ -66,8 +66,12 @@ def dataRequest(request):
 #------------------------------------------------------------------------------#
     if request.method == 'GET':
 
+        if 'data' not in reqBody:
+            responseObj.status_code = 400
+            return responseObj
+
         try:
-            result = DataRequest.response( userObj )
+            result = DataRequest.response( userObj , reqBody['data'] )
         except Exception as ex:
             logger.error(ex)
             responseObj.status_code = 500

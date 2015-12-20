@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 #------------------------------------------------------------------------------#
 ################################################################################
 def request( userObj , data ):
-    logger.info("Screening Request")
+    logger.info("Screening DATA Request")
 
     for deviceKey in data.keys():
 
@@ -47,25 +47,59 @@ def request( userObj , data ):
 ################################################################################
 #------------------------------------------------------------------------------#
 ################################################################################
-def response( userObj ):
+def response( userObj, data ):
+    logger.info("Screening RESPONSE Request")
 
-    logger.info( "Response for " + str( userObj.identifier ) )
+    for deviceKey in data.keys():
 
-    deviceObjs = GardenModels.getDeviceList( user_id = userObj.identifier )
+        deviceObj = GardenModels.getDevice( identifier = deviceKey)
 
-    logger.info( "Process Response for " + str( len(deviceObjs) ) + " Devices" )
+        if deviceObj == None:
+            return False
 
-    if len(deviceObjs) < 1:
-        return False
+        logger.debug( "DeviceObj: " + deviceObj.identifier )
+
+        # making sure device belongs to the user
+        if deviceObj.user.identifier != userObj.identifier:
+            logger.error( "Device Does Not Belong To User: " + deviceKey )
+            return False
+
+        for dataTypeKey in data[ deviceKey ]:
+
+            dataTypeObj = GardenModels.getDataType( identifier = dataTypeKey )
+
+            if dataTypeObj == None:
+                return False
+
+            logger.debug( "DataTypeObj: " + dataTypeObj.identifier )
+
+        #endfor
+    #endfor
+    return __retrieveResponse( data )
+#enddef
+################################################################################
+#------------------------------------------------------------------------------#
+################################################################################
+def __retrieveResponse( data ):
 
     returnData = {}
-    for deviceObj in deviceObjs:
 
-        logger.debug( "Working on " + deviceObj.identifier )
-        returnData[ deviceObj.identifier ] = {}
-        responseObjs = GardenModels.getResponseList( device =  deviceObj )
+    for deviceKey in data.keys():
+        deviceObj = GardenModels.getDevice( identifier = deviceKey)
 
-        for responseObj in responseObjs:
+        logger.debug( "DeviceObj: " + deviceObj.identifier )
+
+        for dataTypeKey in data[ deviceKey ]:
+
+            dataTypeObj = GardenModels.getDataType( identifier = dataTypeKey )
+
+            logger.debug( "DataTypeObj: " + dataTypeObj.identifier )
+
+            returnData[ deviceObj.identifier ] = {}
+            responseObj= GardenModels.getResponse( device =  deviceObj, datatype = dataTypeObj)
+            if responseObj == None:
+                return False
+
             logger.debug( "Response Object: " + str( responseObj.identifier ) )
             returnData[ responseObj.device.identifier ][ responseObj.datatype.identifier ] = \
                     responseObj.value
@@ -75,8 +109,6 @@ def response( userObj ):
         logger.debug("Response: " + returnDataString )
 
     return returnDataString
-#enddef
-
 ################################################################################
 #------------------------------------------------------------------------------#
 ################################################################################

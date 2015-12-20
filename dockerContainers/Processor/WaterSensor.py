@@ -22,7 +22,7 @@ class WaterSensor:
             if int(point['created']) > self.lastDataPoint:
                 self.lastDataPoint = int(point['created'])
 
-            if int(point['value']) > self.minLevel:
+            if int(point['value']) < self.maxLevel:
                 if self.currentState:
                     self.lastChange = int( time.time() )
                 self.logger.info("Sensor Off")
@@ -40,11 +40,6 @@ class WaterSensor:
             self.logger.info("Sensor Off")
             self.currentState = 0
             return 0
-
-        #check to ensure we've not been True for too long
-        if self.currentState:
-            if int( time.time() ) - self.lastChange > self.onSafety:
-                raise Exception('Detected Sensor Malfunction: On Too Long')
 
 #                                                                              #
 #------------------------------------------------------------------------------#
@@ -67,10 +62,9 @@ class WaterSensor:
             self.iterTime       = 1
             self.logger         = logger
             # class specific
-            self.minLevel = 300
+            self.maxLevel = 50
             self.currentState = 0
             self.lastChange   = int( time.time() )
-            self.onSafety = 60
             self.timeSafety = 10
             self.lastDataPoint = 0
 

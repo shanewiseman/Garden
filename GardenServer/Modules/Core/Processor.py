@@ -21,7 +21,8 @@ def createProcessor( dataTypeObj , deviceObj , responseObj ):
         identifier = instance['identifier'],
         node = instance['node'],
         datatype = dataTypeObj,
-        device = deviceObj
+        device = deviceObj,
+        response = responseObj
     ).save()
 
 #enddef
